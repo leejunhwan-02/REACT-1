@@ -45,8 +45,7 @@ src/index.css
 
 
 
-## 3월 13일 (2주차)
-오늘 배운 내용
+
 
 
 # Getting Started with Create React App
