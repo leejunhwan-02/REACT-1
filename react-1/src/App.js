@@ -1,10 +1,29 @@
-import MyB from "./MyButton"
-import { Button1, Button3 } from "./ButtonLib"
-import AP from "./AboutPage"
-import Profile from "./Profile"
-import './App.css'
+import Board from './Board';
+import './App.css';
+/*
+import MyB from "./MyButton";
+import { Button1, Button3 } from "./ButtonLib";
+import AP from "./AboutPage";
+import Profile from "./Profile";
 import { useState } from 'react';
+*/
 
+export default function App() {
+  return (
+    <div>
+      <h1>Tic Tac Toe</h1>
+      <Board/>
+    </div>
+  )
+}
+
+
+
+
+
+
+
+/*
 const products = [
   { title: 'Cabbage', isFruit: false, id: 1 },
   { title: 'Garlic', isFruit: false, id: 2 },
@@ -12,33 +31,38 @@ const products = [
 ];
 
 export default function App() {
-  const listItems = products.map(product =>
-    <li
-      key={product.id}
-      style={{
-        color: product.isFruit ? 'magenta' : 'darkgreen'
-      }}
-    >
-      {product.title}
-    </li>
-  );
+  const [sharedCount, setSharedCount] = useState(0);
 
-  return(
+  function handleSharedClick() {
+    setSharedCount(sharedCount + 1);
+  }
+
+  const listItems = products.map(product => (
+    <li key={product.id}>{product.title}</li>
+  ));
+
+  return (
     <div className="wrapper">
       <h1>Hello React</h1>
-      <MyB/><br/>
+      <MyB /><br />
       <Button1 />&nbsp;
       <Button3 />
       <AP />
       <Profile />
       <ul>{listItems}</ul>
+
       <h1>Counters that update separately</h1>
-      <MyButton />
-      <MyButton />
+      <IndividualButton />
+      <IndividualButton />
+
+      <h1>Counters that update together</h1>
+      <SharedButton count={sharedCount} onClick={handleSharedClick} />
+      <SharedButton count={sharedCount} onClick={handleSharedClick} />
     </div>
   );
 }
-function MyButton() {
+
+function IndividualButton() {
   const [count, setCount] = useState(0);
 
   function handleClick() {
@@ -51,3 +75,12 @@ function MyButton() {
     </button>
   );
 }
+
+function SharedButton({ count, onClick }) {
+  return (
+    <button onClick={onClick}>
+      Clicked {count} times
+    </button>
+  );
+}
+*/
