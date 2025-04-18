@@ -2,13 +2,15 @@ import { useState } from "react";
 import Spuare from "./Square"
 
 export default function Board() {
-    const [squares, setSquares] = useState(Array(9).fill(null));
-    
-    function handleClick() {
+    const [xIsNext, setXIsNext] = useState(true);
+    const [squares, setSquares] = useState(Array(9).fill(null))
+
+    function handleClick(i) {
         const nextSquares = squares.slice();
         nextSquares[0] = "x";
         setSquares(nextSquares);
     }
+     
     return (
       <>
       <div className='board-row'>

@@ -1,6 +1,179 @@
 # 이준환 학번 : 202130425
 
+## 4월 18일 (보강주차)
+
 ## 4월 17일 (7주차)
+
+## 📌 State 끌어올리기
+
+### 🧩 handleClick 함수 정의
+
+```jsx
+export default function Board() {
+  const [squares, setSquares] = useState(Array(9).fill(null));
+
+  function handleClick() {
+    const nextSquares = squares.slice();
+    nextSquares[0] = "X";
+    setSquares(nextSquares);
+  }
+
+  return (
+    // ...
+  );
+}
+```
+
+---
+
+### 🧠 handleClick 함수 설명
+
+- `handleClick` 함수는 `slice()` 메서드로 `squares` 배열을 복사해 `nextSquares`를 만듭니다.
+- `nextSquares[0]`에 "X"를 추가한 후 `setSquares`를 호출해 상태를 업데이트합니다.
+- 이로 인해 `Board` 컴포넌트와 자식 컴포넌트인 `Square`가 다시 렌더링됩니다.
+
+---
+
+### 📎 Closure 개념
+
+- 클로저는 **스코프를 기준으로 변수 접근 범위를 제한**하는 개념입니다.
+- 외부 함수 스코프에서는 내부 함수 스코프의 변수에 접근 ❌
+- 내부 함수는 외부 함수 스코프의 변수에 접근 ⭕
+
+**장점**
+1. 전역 변수 최소화
+2. 데이터 은닉 가능
+3. 코드 모듈화
+4. 정보 접근 제한
+
+---
+
+## ❌ handleClick(0) 직접 호출 시 문제
+
+```jsx
+<Square value={squares[0]} onSquareClick={handleClick(0)} />
+```
+
+- 위 코드는 JSX 렌더링 시 `handleClick(0)`이 즉시 실행됨
+- `setSquares` 호출로 인해 `Board`가 다시 렌더링되고, 또 다시 `handleClick(0)`이 실행되어 **무한 루프 발생**
+
+🔥 오류 메시지:
+```bash
+Too many re-renders. React limits the number of renders to prevent an infinite loop.
+```
+
+---
+
+## ✅ 해결 방법: 화살표 함수 사용
+
+```jsx
+<Square value={squares[0]} onSquareClick={() => handleClick(0)} />
+```
+
+- `() => handleClick(0)`은 함수형 함수로, 클릭될 때만 실행됨
+- 클릭 시 `handleClick(0)`이 실행되어 상태 변경이 발생함
+
+---
+
+## 🔄 상태 끌어올리기 전체 흐름
+
+1. `Board`가 모든 `state`를 관리함
+2. 자식 `Square`에 `onSquareClick` props 전달
+3. `Square` 클릭 시 props로 받은 `handleClick` 실행 요청
+4. `handleClick`은 상태를 업데이트 → `Board` 다시 렌더링
+5. 다시 렌더링되며 `Square`들도 새로운 props로 렌더링됨
+
+---
+
+## 🧪 시나리오 예시
+
+사용자가 `Board`의 **왼쪽 위 사각형**을 클릭하면 어떤 일이 일어나는지 순서대로 정리:
+
+1. `Square` 컴포넌트에서 `onClick`으로 받은 함수 실행
+2. `Board`에서 전달된 `handleClick(0)` 실행
+3. `handleClick`은 `squares[0] = "X"`로 업데이트
+4. `setSquares` 호출 → `Board` 전체 다시 렌더링
+5. 변경된 `squares`에 따라 `Square`도 `"X"`로 값이 바뀜
+
+결과적으로 사용자는 클릭한 부분에 `"X"`가 나타나는 것을 확인할 수 있음 ✅
+
+### 🔸 DOM 이벤트 vs 사용자 정의 컴포넌트
+- DOM `<button>`의 `onClick`은 HTML 빌트인 이벤트로 특별한 의미를 가짐
+- 사용자 정의 컴포넌트(`Square`)의 경우 `onSomething`, `handleSomething` 네이밍은 사용자 자유
+- `Square`의 `onSquareClick` props와 `Board`의 `handleClick`은 이름이 달라도 동작 동일
+
+---
+
+## 🔐 불변성이 왜 중요한가요
+
+### ✅ 불변성 장점 1
+- 원본 데이터를 직접 변경하지 않음으로써 여러 이점을 얻음
+1. 복잡한 기능 쉽게 구현 가능
+2. 시간 여행 기능 구현 가능 (ex: 이전 상태로 되돌리기)
+3. 특정 작업 실행 취소 및 다시 실행 가능
+4. 상태 초기화도 쉽게 가능
+
+---
+
+### ✅ 불변성 장점 2
+- `state`가 변경되면 모든 자식 컴포넌트가 다시 렌더링됨
+- 이때 변경 사항이 없는 컴포넌트도 포함됨 → 성능 저하 가능
+- `memo API`로 최적화 가능
+
+---
+
+## 🔁 교대로 두기 - 1단계
+
+```jsx
+export default function Board() {
+  const [xIsNext, setXIsNext] = useState(true);
+  const [squares, setSquares] = useState(Array(9).fill(null));
+
+  function handleClick(i) {
+    const nextSquares = squares.slice();
+    if (xIsNext) {
+      nextSquares[i] = "X";
+    } else {
+      nextSquares[i] = "O";
+    }
+    setSquares(nextSquares);
+    setXIsNext(!xIsNext);
+  }
+
+  return (
+    // ...
+  );
+}
+```
+
+🛠 개발자 도구에서 state 변화를 확인해보자
+
+---
+
+## 🚫 교대로 두기 - 2단계 문제
+
+- 같은 사각형을 여러 번 클릭하면 `X`와 `O`가 덮여씌워짐 → 잘못된 동작
+
+**해결 방법**
+1. 이미 채워진 칸이면 return 처리
+
+```jsx
+function handleClick(i) {
+  if (squares[i]) return;
+  const nextSquares = squares.slice();
+  // ...
+}
+```
+
+이제 빈 칸에만 `X` 또는 `O`가 추가됨
+
+---
+
+## 🔁 return의 의미
+
+- `return`은 함수를 즉시 종료시킴
+- 값을 명시하지 않으면 `undefined` 반환됨
+- 예: `if (squares[i]) return;` → 이미 값이 있으면 더 이상 진행하지 않고 종료
 
 ## 4월 10일 (6주차)
 ## 📦 보드 만들기
