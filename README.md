@@ -1,6 +1,135 @@
 # 이준환 학번 : 202130425
 
+## 5월 08일 (9주차)
+
+## 4월 24일 (8주차 시험)
+
 ## 4월 18일 (보강주차)
+
+# React 상태 끌어올리기 & 클로저 개념 정리
+
+## 1. 상태 끌어올리기 (State Lifting)
+
+### 핵심 요약
+- `state`는 보통 상위 컴포넌트(Board)가 관리하며, 하위 컴포넌트(Square)로 `props`를 통해 전달한다.
+- Square 컴포넌트는 클릭 시 상위 Board 컴포넌트의 `handleClick` 함수를 호출해 상태를 업데이트한다.
+- 상태가 변경되면 Board와 하위 Square 컴포넌트가 **자동으로 다시 렌더링**된다.
+
+### 동작 흐름 요약
+```jsx
+export default function Board() {
+  const [squares, setSquares] = useState(Array(9).fill(null));
+
+  function handleClick() {
+    const nextSquares = squares.slice();
+    nextSquares[0] = "X";
+    setSquares(nextSquares);
+  }
+
+  return (
+    <div className="board-row">
+      <Square value={squares[0]} onSquareClick={() => handleClick()} />
+    </div>
+  );
+}
+```
+
+> ⚠️ `onClick={handleClick()}`처럼 직접 호출하면 **무한 루프에 빠질 수 있음**. 반드시 함수 형태로 전달해야 함: `() => handleClick()`.
+
+---
+
+## 2. 클로저(Closure)의 개념
+
+### 정의
+- 클로저는 **함수와 그 함수가 선언된 렉시컬 환경**의 조합이다.
+- 내부 함수가 **외부 함수의 변수에 접근할 수 있는 현상**을 의미한다.
+
+### 특징
+- **외부 함수 → 내부 함수 접근 불가**
+- **내부 함수 → 외부 함수의 변수 접근 가능**
+
+### 장점
+1. 전역 변수 사용 최소화
+2. 데이터 은닉 및 보존 가능
+3. 모듈화된 코드 구성
+4. 정보 은닉 (캡슐화)
+
+---
+
+## 3. Game 컴포넌트로 상태 끌어올리기
+
+### Game 컴포넌트 도입
+```jsx
+export default function Game() {
+  return (
+    <div className="game">
+      <div className="game-board">
+        <Board />
+      </div>
+      <div className="game-info">
+        <ol>{/*TODO*/}</ol>
+      </div>
+    </div>
+  );
+}
+```
+
+- `index.js`에서 Game을 최상위로 렌더링
+- `<div>` 레이아웃 구성으로 게임 정보 영역 확보
+
+### 상태 관리 확장
+```jsx
+const [xIsNext, setXIsNext] = useState(true);
+const [history, setHistory] = useState([Array(9).fill(null)]);
+```
+
+- 현재 상태는 `history[history.length - 1]`로 계산 가능
+
+---
+
+## 4. Board 컴포넌트의 props 전환
+
+### Board에서 state 제거하고 props로만 받기
+```jsx
+<Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+```
+
+### handleClick 변경
+```jsx
+function handleClick(i) {
+  const nextSquares = squares.slice();
+  nextSquares[i] = xIsNext ? "X" : "O";
+  onPlay(nextSquares);
+}
+```
+
+---
+
+## 5. 레이아웃 깨짐 해결
+
+- `<button>`을 `<div>`로 감싸지 말 것
+- `<React.Fragment>`로 감싸거나 `<button>` 단독 사용
+- float 스타일은 `button`까지만 적용
+
+---
+
+## 6. 과거 움직임 표시하기
+
+### history 배열 map으로 렌더링
+```jsx
+const moves = history.map((squares, move) => {
+  return (
+    <li key={move}>
+      <button onClick={() => jumpTo(move)}>Go to move #{move}</button>
+    </li>
+  );
+});
+```
+
+### 설명
+- `map`은 배열 각 요소에 대해 버튼을 반환
+- `jumpTo(move)`로 해당 턴으로 이동 가능
+- `moves`는 `<ol>{moves}</ol>`로 렌더링됨
 
 ## 4월 17일 (7주차)
 

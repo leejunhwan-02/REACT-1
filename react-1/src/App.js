@@ -1,5 +1,6 @@
 import Board from './Board';
 import './App.css';
+import './Game.js';
 /*
 import MyB from "./MyButton";
 import { Button1, Button3 } from "./ButtonLib";
