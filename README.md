@@ -1,6 +1,123 @@
 # 이준환 학번 : 202130425
 
-## 5월 08일 (9주차)
+## 5월 15일 (11주차)
+
+# 📘 React 상태 관리 정리
+
+## 1. Props vs State
+
+### 📌 Props
+- 함수 인자로 전달됨.
+- 부모 컴포넌트 → 자식 컴포넌트로 값 전달.
+- 자식 컴포넌트는 props를 **읽기 전용(read-only)** 으로 사용.
+- UI 커스터마이징에 사용됨. (`<Button color="blue" />`)
+
+### 📌 State
+- 컴포넌트 내부에서 선언하며 **메모리 같은 역할**을 함.
+- 사용자 입력 등으로 바뀌는 값 관리.
+- 컴포넌트의 동작이나 렌더링에 영향을 줌.
+- `useState()`로 선언.
+
+---
+
+## 2. 어떤 값이 state여야 하는가?
+
+| 항목 | State인가? | 이유 |
+|------|------------|------|
+| 제품 원본 목록 | ❌ | props로 전달되므로 state가 아님 |
+| 검색어 (filterText) | ✅ | 시간이 지남에 따라 변하고 계산할 수 없음 |
+| 체크박스 상태 (inStockOnly) | ✅ | 계산 불가능한 사용자 입력값 |
+| 필터링된 제품 목록 | ❌ | 원본 목록 + 검색어 + 체크박스로 계산 가능 |
+
+✅ 결론: **검색어와 체크박스 값만 state**로 두면 된다.
+
+---
+
+## 3. State는 어디에 있어야 하는가?
+
+### ✔️ 3단계 전략
+1. 해당 state로 렌더링되는 컴포넌트들을 찾는다.
+2. 가장 가까운 공통 부모 컴포넌트를 찾는다.
+3. 그 컴포넌트에 state를 둔다.
+
+📌 `ProductTable`, `SearchBar` 모두 `filterText`, `inStockOnly`에 의존하므로,
+📍 공통 부모인 `FilterableProductTable`에 상태를 둔다.
+
+```jsx
+function FilterableProductTable({ products }) {
+  const [filterText, setFilterText] = useState('');
+  const [inStockOnly, setInStockOnly] = useState(false);
+
+  return (
+    <div>
+      <SearchBar
+        filterText={filterText}
+        inStockOnly={inStockOnly}
+        onFilterTextChange={setFilterText}
+        onInStockOnlyChange={setInStockOnly}
+      />
+      <ProductTable
+        products={products}
+        filterText={filterText}
+        inStockOnly={inStockOnly}
+      />
+    </div>
+  );
+}
+```
+
+---
+
+## 4. SearchBar 구현 시 유의사항
+
+🔴 다음과 같은 에러가 발생할 수 있음:
+```
+You provided a `value` prop to a form field without an `onChange` handler.
+```
+→ props만 설정하고 `onChange`를 누락한 경우.
+
+✅ 해결 방법: 양방향 바인딩 처리 필요
+
+```jsx
+function SearchBar({
+  filterText,
+  inStockOnly,
+  onFilterTextChange,
+  onInStockOnlyChange,
+}) {
+  return (
+    <form>
+      <input
+        type="text"
+        value={filterText}
+        placeholder="Search..."
+        onChange={(e) => onFilterTextChange(e.target.value)}
+      />
+      <label>
+        <input
+          type="checkbox"
+          checked={inStockOnly}
+          onChange={(e) => onInStockOnlyChange(e.target.checked)}
+        />
+        {' '}
+        Only show products in stock
+      </label>
+    </form>
+  );
+}
+```
+
+---
+
+## 5. 요약
+
+- props는 **전달된 데이터**고, state는 **내부에서 관리되는 데이터**.
+- 사용자 입력, 체크박스 등 **시간에 따라 변하는 값**은 state로 관리.
+- 여러 컴포넌트가 공유하면, **공통 부모 컴포넌트에 state를 둔다**.
+- `value`, `checked`를 사용할 땐 반드시 `onChange`도 추가해야 함.
+
+
+## 5월 08일 (10주차)
 # 📘 React 학습 정리 - 9번째 수업 (2025-05-08)
 
 ## 🧠 핵심 개념 요약
